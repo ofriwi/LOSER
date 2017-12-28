@@ -46,12 +46,12 @@ kernals = np.ones((2,2),np.uint8)
 
 
 #   PID
-P = 0.0
-I = 0.3
+P = 0.1
+I = 0.0
 D = 0.0
 pid_manager = servo_pid(P, I, D, 0)
 
-
+ratio=1#/3.0
 
 
 
@@ -118,13 +118,16 @@ for fram in cam.capture_continuous(raw,format='bgr',use_video_port=True):
             rect = cv2.minAreaRect(con)
             w = rect[1][0]
             h = rect[1][1]
-            
-            if abs (cv2.contourArea(con)/(w*h) - 0.42) < 0.2 and w/h<1.5 and h/w<1.5:
+            #42
+            #54
+            if abs (cv2.contourArea(con)/(w*h) - 0.55) < 0.1 and w/h<1.5 and h/w<1.5:
+                print("Calibration: "+str(cv2.contourArea(con)/(w*h)))
                 c = con
-                print((rect[0][0]-center[0],rect[0][1]-center[1]))
+                #print((rect[0][0]-center[0],rect[0][1]-center[1]))
                 x = rect[0][0] - center[0]
                 y = rect[0][1] - center[1]
-                do_step(x, y)
+                print("pos=" + str(y))
+                pid_manager.do_step(-x*ratio, -y*ratio)
             #CONVEX HULL
              #   hull = cv2.convexHull(con,returnPoints = False)
              #   defects = cv2.convexityDefects(con,hull)

@@ -1,25 +1,35 @@
-from pid import PID
+from PID import PID
 import time
-from servo.Arduino_Servo import Arduino_Servo
+from Arduino_Servo2 import Arduino_Servo
 
 class servo_pid:
-    def pid_step(position):
+    def pid_step(self, position):
         self.pid.update(position)
         output = self.pid.output
+        print("out="+str(output))
         return output
 
-    def pid_init(P, I, D, set_point):
-        self.pid = PID.PID(P, I, D)
+    def __init__(self, P, I, D, set_point):
+        self.pid = PID(P, I, D)
         self.pid.SetPoint=set_point
-        return pid
+        self.servo = Arduino_Servo()
+        self.last_pos = 90
         
-    def deg_limit(min_deg, max_deg):
-        
-    def do_step(x, y):
+    def do_step(self, x, y):
+        position = y
         pid_out = self.pid_step(position)
-        print(motor_out)
-        servo.set_angle(motor_out)
+        motor_out = self.crop(self.last_pos + pid_out, 0, 180)
+        self.last_pos = motor_out
+        print(['cur = ', self.last_pos])
+        self.servo.set_angle(motor_out)
 
+    @staticmethod
+    def crop(val, min_val=0, max_val=180):
+        if val > max_val:
+            val = max_val
+        if val < min_val:
+            val = min_val
+        return val
 '''
 servo = Arduino_Servo()
 poses = [100, 70, 35, 38, 40, 50, 50, 70, 50]
