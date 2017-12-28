@@ -1,7 +1,7 @@
 
-import PID
+from pid import PID
 import time
-from Servo import *
+from servo.Arduino_Servo import Arduino_Servo
 
 def pid_step(position):
     pid.update(position)
@@ -22,8 +22,7 @@ def crop(val, minimum, maximum):
 
 
 
-servo = Servo(3)
-dt = 0.3
+servo = Arduino_Servo()
 poses = [100, 70, 35, 38, 40, 50, 50, 70, 50]
 '''ALT 1'''
 pid = pid_init(P=0.0, I=1.0, D=0.0, set_point=50.0)
@@ -45,4 +44,4 @@ for position in poses:
     current_angle = crop(current_angle+pid_step(position), 0, 180)
     print(current_angle)
     servo.set_angle(current_angle)
-servo.cleanup(True)
+servo.cleanup()
