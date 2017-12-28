@@ -1,5 +1,5 @@
 from time import sleep
-from ..servo.Arduino_Servo import Arduino_Servo
+from servo.Arduino_Servo2 import Arduino_Servo
 
 servo = Arduino_Servo()
 dt = 1

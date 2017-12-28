@@ -13,6 +13,8 @@ class servo_pid:
         self.pid.SetPoint=set_point
         return pid
         
+    def deg_limit(min_deg, max_deg):
+        
     def do_step(x, y):
         pid_out = self.pid_step(position)
         print(motor_out)
