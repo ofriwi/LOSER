@@ -46,10 +46,10 @@ kernals = np.ones((2,2),np.uint8)
 
 
 #   PID
-P = 0.1
-I = 0.0
+P = 0.0
+I = 0.3
 D = 0.0
-pid_manager = servo_pid(P, I, D, 0)
+pid_manager = servo_pid_no_last(P, I, D, 0)
 
 ratio=1#/3.0
 

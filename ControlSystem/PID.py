@@ -57,7 +57,8 @@ class PID:
 
         # Windup Guard
         self.int_error = 0.0
-        self.windup_guard = 20.0
+        self.windup_min_guard = -20.0
+        self.windup_max_guard = 20.0
 
         self.output = 0.0
 
@@ -79,10 +80,10 @@ class PID:
             self.PTerm = self.Kp * error
             self.ITerm += error * delta_time
 
-            if (self.ITerm < -self.windup_guard):
-                self.ITerm = -self.windup_guard
-            elif (self.ITerm > self.windup_guard):
-                self.ITerm = self.windup_guard
+            if (self.ITerm < self.windup_min_guard):
+                self.ITerm = self.windup_min_guard
+            elif (self.ITerm > self.windup_max_guard):
+                self.ITerm = self.windup_max_guard
 
             self.DTerm = 0.0
             if delta_time > 0:
@@ -106,7 +107,7 @@ class PID:
         """Determines how aggressively the PID reacts to the current error with setting Derivative Gain"""
         self.Kd = derivative_gain
 
-    def setWindup(self, windup):
+    def setWindup(self, min_windup, max_windup):
         """Integral windup, also known as integrator windup or reset windup,
         refers to the situation in a PID feedback controller where
         a large change in setpoint occurs (say a positive change)
@@ -116,7 +117,8 @@ class PID:
         (offset by errors in the other direction).
         The specific problem is the excess overshooting.
         """
-        self.windup_guard = windup
+        self.windup_min_guard = min_windup
+        self.windup_max_guard = max_windup
 
     def setSampleTime(self, sample_time):
         """PID that should be updated at a regular interval.

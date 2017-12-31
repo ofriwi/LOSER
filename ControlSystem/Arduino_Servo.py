@@ -1,5 +1,6 @@
 import struct
 import serial
+from Constants import *
 
 class Arduino_Servo:
     
@@ -13,7 +14,9 @@ class Arduino_Servo:
     # Rotate servo 
     def set_angle(self, angle, limit_angle=True):
         if limit_angle:
-            angle = int(self.crop(int(angle)))
+            angle = int(self.crop(int(angle)), MIN_SERVO_DEG, MAX_SERVO_DEG)
+        if DEBUG_MODE or SERVO_DEBUG_MODE:
+            print("Servo set to", angle)
         self.ser.write(struct.pack('>B', angle))
     
     # Get an angle (0<=angle<=180)
