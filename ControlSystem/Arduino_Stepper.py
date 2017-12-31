@@ -2,8 +2,12 @@ import struct
 import serial
 from Constants import *
 
-class Arduino_Servo:
-    
+class Arduino_Stepper:
+
+    FULL_STEP = 'full'
+    HALF_STEP = 'half'
+
+    '''   CODE FROM SERVO, need to be modified
     # Initialize communication
     def __init__(self, baudrate=9600, port="/dev/ttyUSB0"):
         self.ser = serial.Serial()
@@ -12,19 +16,12 @@ class Arduino_Servo:
         self.ser.open()
     
     # Rotate servo 
-    def set_angle(self, angle, limit_angle=True):
+    def move(self, angle, step_mode=FULL_STEP):
         if limit_angle:
             angle = int(self.crop(int(angle)), MIN_SERVO_DEG, MAX_SERVO_DEG)
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print("Servo set to", angle)
-        self.ser.write(struct.pack('>B', angle))
-
-    # Change dt of the servo
-    def set_dt(self, dt):
-        if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print("Servo set dt to", dt)
-        self.ser.write(struct.pack('>B', int(dt)+200))
-        
+            print("Stepper move", angle, "degrees (", steps, "steps)")
+        self.ser.write(struct.pack('>B', steps))
     
     # Get an angle (0<=angle<=180)
     @staticmethod
@@ -38,3 +35,4 @@ class Arduino_Servo:
     #Close serial
     def cleanup(self):
         self.ser.close()
+    '''
