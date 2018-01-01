@@ -1,13 +1,16 @@
 import struct
 import serial
 from Constants import *
+from time import sleep
+
+
+offset = 128
 
 class Arduino_Stepper:
 
-    FULL_STEP = 'full'
-    HALF_STEP = 'half'
+    FULL_STEP = 1
+    HALF_STEP = 2
 
-    '''   CODE FROM SERVO, need to be modified
     # Initialize communication
     def __init__(self, baudrate=9600, port="/dev/ttyUSB0"):
         self.ser = serial.Serial()
@@ -17,22 +20,12 @@ class Arduino_Stepper:
     
     # Rotate servo 
     def move(self, angle, step_mode=FULL_STEP):
-        if limit_angle:
-            angle = int(self.crop(int(angle)), MIN_SERVO_DEG, MAX_SERVO_DEG)
+        # Convension: send angle + 128
+        angle += offset
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print("Stepper move", angle, "degrees (", steps, "steps)")
-        self.ser.write(struct.pack('>B', steps))
-    
-    # Get an angle (0<=angle<=180)
-    @staticmethod
-    def crop(val, min_val=0, max_val=180):
-        if val > max_val:
-            val = max_val
-        if val < min_val:
-            val = min_val
-        return val
-    
+            print("Stepper move", angle-offset, "degrees")
+        self.ser.write(struct.pack('>B', angle))
+ 
     #Close serial
     def cleanup(self):
         self.ser.close()
-    '''

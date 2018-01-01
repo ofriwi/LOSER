@@ -49,9 +49,15 @@ kernals = np.ones((2,2),np.uint8)
 P = 0.31
 I = 0.02
 D = 0.0
-pid_manager = servo_pid(P, I, D, 0)
-#pid_manager.pid.setWindup(SERVO_MIN_DEG, SERVO_MAX_DEG)
+servo = servo_pid(P, I, D, 0)
 
+
+P = 0.31
+I = 0.02
+D = 0.0
+stepper = stepper_pid(P, I, D, 0)
+
+# deg to pixel ratio
 ratio=1#/3.0
 
 
@@ -128,7 +134,8 @@ for fram in cam.capture_continuous(raw,format='bgr',use_video_port=True):
                 x = rect[0][0] - center[0]
                 y = rect[0][1] - center[1]
                 print("pos=" + str(y))
-                pid_manager.do_step(-y*ratio)
+                servo.do_step(-y*ratio)
+                stepper.do_step(-x*ratio)
             #CONVEX HULL
              #   hull = cv2.convexHull(con,returnPoints = False)
              #   defects = cv2.convexityDefects(con,hull)
