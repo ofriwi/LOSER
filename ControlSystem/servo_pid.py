@@ -11,7 +11,7 @@ class servo_pid:
         self.pid.update(position)
         output = self.pid.output
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print('PID output is:', output)
+            print('PID output is:'+ str(output))
         return output
 
     # Initialize
@@ -27,10 +27,10 @@ class servo_pid:
         position = y
         motor_out = self.last_pos + self.pid_step(position)
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print('Last position was:', self.last_pos)
-            print('Before cropping, value is:', motor_out)
-        self.last_pos = motor_out
-        self.servo.set_angle(motor_out)
+            print('Last position was:' + str(self.last_pos))
+            print('Before cropping, value is:' + str(motor_out))
+        self.last_pos = self.servo.set_angle(motor_out)
+        return motor_out
         
 class servo_pid_no_last:
     
@@ -39,7 +39,7 @@ class servo_pid_no_last:
         self.pid.update(position)
         output = self.pid.output
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print('PID output is:', output)
+            print('PID output is:' + str(output))
         return output
 
     # Initialize
@@ -55,6 +55,7 @@ class servo_pid_no_last:
         position = y
         motor_out = self.pid_step(position) + SERVO_CENTER_DEG
         if DEBUG_MODE or SERVO_DEBUG_MODE:
-            print('No last pos mode')
-            print('Before cropping, value is:', motor_out)
+            print('\nNo last pos mode')
+            print('Before cropping, value is:' + str(motor_out))
         self.servo.set_angle(motor_out)
+        return motor_out

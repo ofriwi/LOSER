@@ -5,7 +5,7 @@ from Constants import *
 class Arduino_Servo:
     
     # Initialize communication
-    def __init__(self, baudrate=9600, port="/dev/ttyUSB0"):
+    def __init__(self, baudrate=9600, port=SERVO_PORT):
         self.ser = serial.Serial()
         self.ser.baudrate = baudrate
         self.ser.port = port
@@ -14,10 +14,11 @@ class Arduino_Servo:
     # Rotate servo 
     def set_angle(self, angle, limit_angle=True):
         if limit_angle:
-            angle = int(self.crop(int(angle)), MIN_SERVO_DEG, MAX_SERVO_DEG)
+            angle = int(self.crop(int(angle), SERVO_MIN_DEG, SERVO_MAX_DEG))
         if DEBUG_MODE or SERVO_DEBUG_MODE:
             print("Servo set to", angle)
         self.ser.write(struct.pack('>B', angle))
+        return angle
 
     # Change dt of the servo
     def set_dt(self, dt):
