@@ -38,4 +38,5 @@ class Arduino_Servo:
     
     #Close serial
     def cleanup(self):
+        self.set_angle(SERVO_CENTER_DEG);
         self.ser.close()

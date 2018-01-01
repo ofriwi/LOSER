@@ -5,9 +5,11 @@
 #define MS1 10
 #define MS2 11
 #define EN  12
+int step_mode = 2;
 int steps_per_revolution = 400;
-int dt = 5;
+int dt = 3;
 int offset = 128;
+
 
 //Declare variables for functions
 int x;
@@ -27,18 +29,15 @@ void setup() {
 
 //Main loop
 void loop() {
-  /*Step(100);
-  delay(100);
-  Step(360);
-  delay(100);
-  Step(-360);*/
-  
   if(Serial.available() > 0){
-      int user_input = (int)Serial.read(); //Read user input and trigger appropriate function
-      digitalWrite(EN, LOW); //Pull enable pin low to allow motor control
-      Serial.print(user_input);
-      Step(user_input);
-      resetEDPins();
+    while(Serial.available() > 1){
+      Serial.read();
+    }//     WAIT FOR LAST INPUT*/
+    int user_input = (int)Serial.read(); //Read user input and trigger appropriate function
+    digitalWrite(EN, LOW); //Pull enable pin low to allow motor control
+    //sSerial.print(user_input);
+    Step(user_input);
+    resetEDPins();
   }
 }
 
@@ -47,14 +46,25 @@ void resetEDPins()
 {
   digitalWrite(stp, LOW);
   digitalWrite(dir, LOW);
-  digitalWrite(MS1, LOW);
-  digitalWrite(MS2, LOW);
+  if (step_mode == 1){
+    digitalWrite(MS1, LOW);
+    digitalWrite(MS2, LOW);
+  }else if (step_mode == 2){
+    digitalWrite(MS1, HIGH);
+    digitalWrite(MS2, LOW);
+  }else if (step_mode == 4){
+    digitalWrite(MS1, LOW);
+    digitalWrite(MS2, HIGH);
+  }else if (step_mode == 8){
+    digitalWrite(MS1, HIGH);
+    digitalWrite(MS2, HIGH);
+  }
   digitalWrite(EN, HIGH);
 }
 
 void Step(int angle){
   angle -= offset;
-  int steps = int(angle/360.0*steps_per_revolution);
+  int steps = int(angle/360.0*steps_per_revolution * step_mode);
   //Serial.print(steps);
   if (steps > 0){
     digitalWrite(dir, LOW);
@@ -63,6 +73,7 @@ void Step(int angle){
   }
   for(x = 0; x<abs(steps); x++)  //Loop the forward stepping enough times for motion to be visible
   {
+    //Serial.print("s");
     digitalWrite(stp,HIGH); //Trigger one step forward
     delay(dt);
     digitalWrite(stp,LOW); //Pull step pin low so it can be triggered again

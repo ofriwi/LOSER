@@ -39,4 +39,5 @@ class Arduino_Stepper:
     
     #Close serial
     def cleanup(self):
+        self.move(0)
         self.ser.close()

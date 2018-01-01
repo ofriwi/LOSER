@@ -7,7 +7,7 @@ class servo_pid:
     
     # Calculate next PID value
     def pid_step(self, position):
-        self.pid.setWindup(SERVO_MIN_DEG - self.last_pos, SERVO_MAX_DEG - self.last_pos)  # Ensure output in servo's range
+        self.pid.setWindup(-SERVO_MAX_DELTA, SERVO_MAX_DELTA)  # Ensure output is not too big
         self.pid.update(position)
         output = self.pid.output
         if DEBUG_MODE or SERVO_DEBUG_MODE:

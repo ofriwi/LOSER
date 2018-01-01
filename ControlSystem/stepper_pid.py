@@ -9,7 +9,7 @@ class stepper_pid:
     def pid_step(self, position):
         self.pid.update(position)
         output = self.pid.output
-        if DEBUG_MODE or STEPPER_DEBUG_MODE
+        if DEBUG_MODE or STEPPER_DEBUG_MODE:
             print('PID output is:', output)
         return output
 
@@ -26,4 +26,4 @@ class stepper_pid:
         motor_out = self.pid_step(position)
         if DEBUG_MODE or STEPPER_DEBUG_MODE:
             print('Before cropping, stepper output is:', motor_out, 'deg')
-        self.servo.set_angle(motor_out)
+        self.stepper.move(motor_out)
