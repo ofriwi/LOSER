@@ -9,4 +9,4 @@ try:
         stepper.move(x)
 except KeyboardInterrupt:
     print("S")
-    servo.cleanup()
+    stepper.cleanup()

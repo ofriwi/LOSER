@@ -135,7 +135,7 @@ for fram in cam.capture_continuous(raw,format='bgr',use_video_port=True):
                 y = rect[0][1] - center[1]
                 print("pos=" + str(y))
                 servo.do_step(-y*ratio)
-                stepper.do_step(-x*ratio)
+                stepper.do_step(x*ratio)
             #CONVEX HULL
              #   hull = cv2.convexHull(con,returnPoints = False)
              #   defects = cv2.convexityDefects(con,hull)
