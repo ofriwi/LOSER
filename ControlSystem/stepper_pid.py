@@ -1,6 +1,6 @@
 from PID import PID
 import time
-from Arduino_Stepper import Arduino_Stepper
+from Arduino_Stepper import Arduino_BT_Stepper
 from Constants import *
 
 class stepper_pid:
@@ -18,7 +18,7 @@ class stepper_pid:
         self.pid = PID(P, I, D)
         self.pid.SetPoint=set_point
         self.pid.setWindup(STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG)  # Ensure output in servo's range
-        self.stepper = Arduino_Stepper()
+        self.stepper = Arduino_BT_Stepper()
             
     # Do the next thing
     def do_step(self, x):

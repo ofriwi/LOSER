@@ -1,4 +1,4 @@
-
+#include <SoftwareSerial.h>
 //Declare pin functions on Redboard
 #define stp 8
 #define dir 9
@@ -15,6 +15,8 @@ int x;
 int y;
 int state;
 
+//BT
+SoftwareSerial bt (5, 6);
 
 void setup() {
   pinMode(stp, OUTPUT);
@@ -25,17 +27,18 @@ void setup() {
   digitalWrite(EN, LOW);
   resetEDPins(); //Set step, direction, microstep and enable pins to default states
   Serial.begin(9600); //Open Serial connection for debugging
+  bt.begin(9600);
 }
 
 //Main loop
 void loop() {
-  if(Serial.available() > 0){
-    while(Serial.available() > 1){
-      Serial.read();
-    }//     WAIT FOR LAST INPUT*/
-    int user_input = (int)Serial.read(); //Read user input and trigger appropriate function
+  if(bt.available() > 0){
+    while(bt.available() > 1){
+      bt.read();
+    }//     WAIT FOR LAST INPUT */
+    int user_input = (int)bt.read(); //Read user input and trigger appropriate function
     int angle = user_input - offset;
-    Serial.print(angle);
+    Serial.println(angle);
     Step(angle);
     resetEDPins();
   }
@@ -63,7 +66,6 @@ void resetEDPins()
 
 void Step(int angle){
   int steps = int(angle/360.0*steps_per_revolution * step_mode);
-  Serial.println(steps);
   //Serial.print(steps);
   if (steps > 0){
     digitalWrite(dir, LOW);

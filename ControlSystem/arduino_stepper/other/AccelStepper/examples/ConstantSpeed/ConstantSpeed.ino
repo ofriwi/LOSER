@@ -15,9 +15,12 @@ void setup()
 {  
    stepper.setMaxSpeed(1000);
    stepper.setSpeed(50);	
+   pinMode(12, OUTPUT);
+   digitalWrite(12, HIGH);
 }
 
 void loop()
 {  
+  
    stepper.runSpeed();
 }

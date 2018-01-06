@@ -19,6 +19,7 @@ class servo_pid:
         self.pid = PID(P, I, D)
         self.pid.SetPoint=set_point
         self.servo = Arduino_Servo()
+        time.sleep(INIT_TIME)
         self.last_pos = SERVO_CENTER_DEG
         self.servo.set_angle(SERVO_CENTER_DEG)
             

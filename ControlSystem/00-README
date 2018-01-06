@@ -1,0 +1,7 @@
+stepper arduino - usb 1
+servo arduino - usb 0
+
+stepper - connect 2x9V
+servo - turn on batteries
+	- connect servo to d7
+	- go to middle before attaching laser

@@ -2,7 +2,7 @@ import struct
 import serial
 from Constants import *
 from time import sleep
-
+import bluetooth
 
 offset = 128
 
@@ -41,3 +41,37 @@ class Arduino_Stepper:
     def cleanup(self):
         self.move(0)
         self.ser.close()
+
+class Arduino_BT_Stepper:
+    
+    FULL_STEP = 1
+    HALF_STEP = 2
+
+    # Initialize communication
+    def __init__(self, bd_addr=STEPPER_BT_ADDR, port=STEPPER_BT_PORT):                
+        self.sock = bluetooth.BluetoothSocket (bluetooth.RFCOMM)
+        self.sock.connect((bd_addr,port))
+    
+    # Rotate servo 
+    def move(self, angle, step_mode=FULL_STEP, limit_angle=True):
+        # Convension: send angle + 128
+        if limit_angle:
+            angle = int(self.crop(int(angle), STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG))
+        angle += offset
+        if DEBUG_MODE or STEPPER_DEBUG_MODE:
+            print("Stepper move", angle-offset, "degrees")
+        self.sock.send(struct.pack('>B', angle))
+ 
+     # Get an angle (0<=angle<=180)
+    @staticmethod
+    def crop(val, min_val=-128, max_val=127):
+        if val > max_val:
+            val = max_val
+        if val < min_val:
+            val = min_val
+        return val
+    
+    #Close serial
+    def cleanup(self):
+        self.move(0)
+        self.sock.close()
