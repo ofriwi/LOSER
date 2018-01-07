@@ -16,9 +16,9 @@ void setup() {
 
 void loop() {
   if(Serial.available() > 0){
-    /*while(Serial.available() > 1){
+    while(Serial.available() > 1){
       Serial.read();
-    }     WAIT FOR LAST INPUT*/
+    }   //  WAIT FOR LAST INPUT*/
     int input = (int)Serial.read();
     Serial.print(input);
     if(input >= 200){

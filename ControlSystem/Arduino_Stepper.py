@@ -22,7 +22,7 @@ class Arduino_Stepper:
     def move(self, angle, step_mode=FULL_STEP, limit_angle=True):
         # Convension: send angle + 128
         if limit_angle:
-            angle = int(self.crop(int(angle), STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG))
+            angle = round(self.crop(int(angle), STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG))
         angle += offset
         if DEBUG_MODE or STEPPER_DEBUG_MODE:
             print("Stepper move", angle-offset, "degrees")
@@ -56,7 +56,7 @@ class Arduino_BT_Stepper:
     def move(self, angle, step_mode=FULL_STEP, limit_angle=True):
         # Convension: send angle + 128
         if limit_angle:
-            angle = int(self.crop(int(angle), STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG))
+            angle = round(self.crop(int(angle), STEPPER_MIN_STEP_DEG, STEPPER_MAX_STEP_DEG))
         angle += offset
         if DEBUG_MODE or STEPPER_DEBUG_MODE:
             print("Stepper move", angle-offset, "degrees")

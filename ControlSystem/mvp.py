@@ -12,12 +12,14 @@ from stepper_pid import *
 def crop_rect(img,rect):
     angle = rect[2]
     rows,cols = img.shape[0],img.shape[1]
-    if cols>rows:
-        M = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
-    else:
-        M = cv2.getRotationMatrix2D((rwos/2,cols/2),angle,1)
+  #  rowsX,colsX = ((rect[1][0]),(rect[1][1]))
+    #if rect[1][0] > rect[1][1]:
+   # M = cv2.getRotationMatrix2D((cols/2,rows/2),angle,1)
+    M = cv2.getRotationMatrix2D(rect[0],angle,1)
+  #  else:
+     #   M = cv2.getRotationMatrix2D(rect[0],-3.14/2+angle,1)
     img_rot = cv2.warpAffine(img,M,(cols,rows))
-    
+    #cv2.imshow("rot",img_rot)
     rect0 = (rect[0],rect[1],0.0)
     box = cv2.boxPoints(rect)
     pts = np.int0(cv2.transform(np.array([box]),M))[0]
@@ -27,7 +29,7 @@ def crop_rect(img,rect):
                                 
 DEBUG = True
 template = cv2.imread("smaller2Temp.png",0)
-cv2.imshow("sss",template)
+
 h,w=template.shape[:2]
 tempSize=(w,h)
 cam = PiCamera()
@@ -38,10 +40,11 @@ center = (500/2,250/2)
 
 cam.rotation = 270
 #cam.vflip = False
-#cam.hflip = True
+cam.hflip = True
 #cam.exposure_mode = 'sports'
 #cam.framerate = 20
-#cam.shutter_speed = 20000
+cam.shutter_speed = 5000 #33186
+#cam.exposure_speed = 5000
 cam.exposure_mode='antishake'
 #cam.iso = 8
 cam.awb_mode='auto'
@@ -50,7 +53,8 @@ cam.awb_mode='auto'
 #cam.shutter_speed = 0
 #cam.exposure_mode = 'off'
 #g= cam.awb_gains
-#cam.awb_mode  = 'off'
+#cam.awb_mode  = 'fluorescent'
+#cam.contrast =-50
 #cam.awb_gains = g
 #print(str(cam.shutter_speed))
 #print(str(cam.awb_gains))
@@ -68,15 +72,19 @@ raw.truncate(0)
 
 
 #   PID
-P = 0.09
-I = 0.03
+P = 0.13
+I = 0.0
 D = 0.0
 servo = servo_pid(P, I, D, 0) #motor
 
 
-P = 0.06
-I = 0.07
-D = 0
+#P = 0.1
+#I = 0.06#-0.07
+#D = 0.03
+
+P = 0.13
+I = 0.003
+D = 0.02
 stepper = stepper_pid(P, I, D, 0) #motor
 
 # deg to pixel ratio
@@ -87,7 +95,7 @@ ratio=1#/3.0
 
 
 
-kernal = np.ones((4,4),np.uint8)
+kernal = np.ones((3,3),np.uint8)
 kernal1 = np.ones((1,1),np.uint8)
 kernals = np.ones((1,1),np.uint8)
 try:
@@ -134,11 +142,13 @@ try:
         #u = np.array([180,255,255])
         #l = np.array([150,87,60]) doesnt filter out library desk
      
-       # l = np.array([78,60,100]) library
-        l = np.array([78,30,100]) #classroom  S20->30
+        #l = np.array([78,60,100]) library
+        l = np.array([78,20,100]) #classroom  S20->30 azulay
+       # l = np.array([65,30,100]) azulzul
 ##        u = np.array([90,149,200])#H95 is tight 185 149 library
-        u = np.array([90,149,220])#90 100  V255->220
-        
+        u = np.array([90,149,220])#90 100  V255->220 azulay
+       
+     #   u = np.array([100,149,220]) azulzul
         
        # l1 = np.array([0,(int)(0.427*255),(int)(0.3*255)])
        # u1= np.array([(int)(0.094*180),255,255])
@@ -146,8 +156,8 @@ try:
        # mask1 = cv2.inRange(hsv,l1,u1)
        # mask = cv2.bitwise_or(mask,mask1)
         #mask = cv2.morphologyEx(mask,cv2.MORPH_CLOSE,kernal)
-       # mask = cv2.erode(mask,kernal1)
-        mask = cv2.dilate(mask,kernal)
+        mask = cv2.erode(mask,kernal1, iterations = 3)
+        mask = cv2.dilate(mask,kernal, iterations = 3)
         
         
         frame = (255-frame)
@@ -182,7 +192,7 @@ try:
                 rect = cv2.minAreaRect(con)
                 
               #  print("RECTANGLE                                "+str(rect[1])) #TODO collapse fun minAreaRect
-                if w!=0 and h!=0 and w/h<2 and h/w<2:#TODO filter long rects using rect[1]
+                if w!=0 and h!=0 :#TODO filter long rects using rect[1]
                  
                      #CLASSIC ROI
                     #x=max(x,3)
@@ -190,15 +200,15 @@ try:
                     #roi = frame[y-3:y+he+6,x-3:x+wi+6]                                     
                    #/CLASSIC ROI
                     
-                    #cv2.drawContours(frame,[np.int0(cv2.boxPoints(rect))],0,[0,255,0],2)
+                   # cv2.drawContours(frame,[np.int0(cv2.boxPoints(rect))],0,[0,255,0],2)
                     roi = crop_rect(frame,rect)
-                    delmesize = roi.shape
+                    
                     if roi.shape[0]<10 or roi.shape[1]<10:
                         continue
                     roi = cv2.resize(roi,((int)(template.shape[1]*1.2),(int)(template.shape[0]*1.2)))
 
-                    cv2.imshow("seemek",roi)
-                    #roi=cv2.resize(roi,tempSize) #TODO RESIZE AFTER THRESH
+                    #cv2.imshow("seemek",roi)
+                    roi=cv2.resize(roi,tempSize) #TODO RESIZE AFTER THRESH
                     roi = cv2.cvtColor(roi,cv2.COLOR_BGR2GRAY)
                     #cv2.imshow("seemek",roi)
                     ret,roi = cv2.threshold(roi,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
@@ -210,20 +220,20 @@ try:
                     #roi = cv2.blur(roi,(4,4))
                     
                    # roi = cv2.medianBlur(roi,13)
-                    roi = cv2.erode(roi, kernals)
+                   # roi = cv2.erode(roi, kernals)
                     tempMatch = cv2.matchTemplate(roi,template,cv2.TM_SQDIFF)
                     min_val,max_val,min_loc,max_loc = cv2.minMaxLoc(tempMatch)
                     
                    # roi = cv2.resize(roi,((int)(roi.shape[1]*5),(int)(roi.shape[0]*5)))
-                    cv2.imshow("roi",roi)
+                #    cv2.imshow("roi",roi)
                    # template = cv2.resize(template,((int)(template.shape[1]*5),(int)(template.shape[0]*5)))
-                    cv2.imshow("template",template)
+                 #   cv2.imshow("template",template)
                     if min_val < 60000000:#4560
                         #cv2.drawContours(frame,[np.int0(cv2.boxPoints(rect))],0,[255,0,0],2)
                         #cv2.putText(frame, str(np.amax(tempMatch)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0,0,255), 1)
                    
-                        print("tempMatch    "+str(min_val/10000000)+"   size   "+str(delmesize))
-                        c = con
+                        # print("tempMatch    "+str(min_val/10000000))
+                        c = con  
                         break
                    
                # if abs (area2RectRatio - 0.42) < 0.2 and w/h<1.5 and h/w<1.5:
@@ -259,25 +269,25 @@ try:
             # PID
             servo.do_step(-pos_from_mid[1]*ratio)#motor
             stepper.do_step(-pos_from_mid[0]*ratio)#motor
-            if DEBUG:
-                cv2.line(frame,((int)(a[0]),(int)(a[1])),((int)(len(frame[0])/2),(int)(len(frame)/2)),(0,255,0),1)
+            
+            cv2.line(frame,((int)(a[0]),(int)(a[1])),((int)(len(frame[0])/2),(int)(len(frame)/2)),(0,255,0),1)
                          
                # box = cv2.boxPoints(rect)
               #  box = np.int0(box)
-            if DEBUG:
+            
                    # cv2.drawContours(frame,[box],0,[0,255,0],2)
-                cv2.drawContours(frame,[np.int0(cv2.boxPoints(rect))],0,[0,255,0],2)
-              #  cv2.rectangle(frame,(x,y),(x+wi,y+he),[0,255,0],2)
+            cv2.drawContours(frame,[np.int0(cv2.boxPoints(rect))],0,[0,255,0],2)
+            
+            #  cv2.rectangle(frame,(x,y),(x+wi,y+he),[0,255,0],2)
         fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer);
         
 
         if DEBUG:
             cv2.putText(frame, "FPS : " + str(int(fps)), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (50,170,50), 1)
      
-        if DEBUG:
-            frame = cv2.resize(frame,(640,480))
-            cv2.imshow("Tracking", frame)
-            cv2.imshow("masked", masked)
+        frame = cv2.resize(frame,(640,480))
+        cv2.imshow("Tracking", frame)
+            #cv2.imshow("masked", masked)
         
         raw.truncate(0)
             # Exit if ESC pressed

@@ -14,7 +14,7 @@ class Arduino_Servo:
     # Rotate servo 
     def set_angle(self, angle, limit_angle=True):
         if limit_angle:
-            angle = int(self.crop(int(angle), SERVO_MIN_DEG, SERVO_MAX_DEG))
+            angle = round(self.crop(round(angle), SERVO_MIN_DEG, SERVO_MAX_DEG))
         if DEBUG_MODE or SERVO_DEBUG_MODE:
             print("Servo set to", angle)
         self.ser.write(struct.pack('>B', angle))
@@ -24,7 +24,7 @@ class Arduino_Servo:
     def set_dt(self, dt):
         if DEBUG_MODE or SERVO_DEBUG_MODE:
             print("Servo set dt to", dt)
-        self.ser.write(struct.pack('>B', int(dt)+200))
+        self.ser.write(struct.pack('>B', round(dt)+200))
         
     
     # Get an angle (0<=angle<=180)
